@@ -89,7 +89,10 @@ async def queue(ctx):
 
         if new_queue_text != queue_text:
             queue_text = new_queue_text
-            updated_embed = discord.Embed(title="Entry", description=f"Queue:\n{queue_text}")
+            updated_embed = discord.Embed(title="Entry", description=f"Queue:\n{queue_text}", color=0x22EA0D)
+            updated_embed.set_thumbnail(url="https://cdn.discordapp.com/attachments/1133691278001979412/1145825848801370203/3d-security-agent-pointing-to-empty-wall.png")
+
+            updated_embed.set_footer(text="Made by: hzh.")
             await message.edit(embed=updated_embed)  # Use message.edit to update the embed
 
         if len(queue_list) > 0:
