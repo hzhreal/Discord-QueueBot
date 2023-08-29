@@ -55,6 +55,9 @@ async def queue(ctx):
 
     class queuebutton(discord.ui.View):
 
+        def __init__(self):
+            super().__init__(timeout=None) # specify the timeout here
+
         @discord.ui.button(label="Join queue", style=discord.ButtonStyle.success)
         async def callback(self, button, interaction):
             author = interaction.user  # Get the author of the interaction (the user who clicked)
