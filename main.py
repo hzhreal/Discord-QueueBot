@@ -52,7 +52,6 @@ async def queue(ctx):
     await ctx.respond("Starting", ephemeral=True)
 
     await changeperm(ctx)
-    print("perm changed")
 
     class queuebutton(discord.ui.View):
 
