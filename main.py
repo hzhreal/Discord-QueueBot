@@ -32,8 +32,11 @@ update_role_running = True
 
 async def changeperm(ctx):
     try:
+        role = discord.utils.get(ctx.guild.roles, name="HTOS-pass") # role name
         await ctx.channel.set_permissions(ctx.guild.default_role, send_messages=False) # makes the channel you run the command in read only for @everyone
+        await ctx.channel.set_permissions(role, send_messages=True)
         print("changed perms")
+
 
         
     except Exception as e:
