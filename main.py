@@ -215,10 +215,11 @@ async def remove(ctx, user: discord.Member):
             except Exception as e:
                 print(f"Error purging: {e}")
             role = discord.utils.get(ctx.guild.roles, name="HTOS-pass") # role name
+            queue_list.remove(user)
             await user.remove_roles(role)
             first_user_pinged = False
-            queue_list.remove(user)
             await ctx.respond(embed=embedrm)
+            return
             
     elif user in queue_list:
         queue_list.remove(user)  # Remove the user from the queue
