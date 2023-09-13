@@ -238,6 +238,9 @@ async def role_error2(ctx, error):
     if isinstance(error, commands.MissingAnyRole):
         await ctx.respond(embed=embed_missing_role)
 
-        
+@bot.slash_command(description="Pings the bot")
+async def ping(ctx):
+    latency = bot.latency * 1000
+    await ctx.respond(f"Pong! {latency: .2f}ms")          
 
 bot.run("") # token
