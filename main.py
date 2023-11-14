@@ -19,15 +19,6 @@ async def on_ready() -> None:
     print(
         f"Bot is ready, invite link: https://discord.com/api/oauth2/authorize?client_id={bot.user.id}&permissions=8&scope=bot"
     )
-@bot.event
-async def on_message(message) -> None:
-    if message.author.bot:
-        return
-
-    if message.content == "hello":
-        await message.channel.send("hi")
-
-    await bot.process_commands(message)
 
 embed_missing_role = discord.Embed(title="Missing role",
                       description="Only the owner can use this command.",
