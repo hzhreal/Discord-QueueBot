@@ -44,11 +44,13 @@ async def idleListener(ctx, bot):
     global first_user_pinged, queue_list
 
     if len(queue_list) >= 1:
+        target = queue_list[0]
+
         def check(message):
-            return message.author == queue_list[0]
+            if len(queue_list) >= 1: return message.author == target
 
         try:
-            message = await bot.wait_for('message', check=lambda message:check(message), timeout=300) # how many seconds until idle kick
+            message = await bot.wait_for('message', check=lambda message:check(message), timeout=5) # how many seconds until idle kick
             print(f"Obtained: {message.content}")
         except asyncio.TimeoutError:
             try:
@@ -56,10 +58,10 @@ async def idleListener(ctx, bot):
                 await target_channel.purge(limit=200)
                 print(f"purged {target_channel}")
                 role = discord.utils.get(ctx.guild.roles, name=ROLE_NAME) # role name
-                removedUser = queue_list.pop(0)
-                await removedUser.remove_roles(role)
+                queue_list.remove(target)
+                await target.remove_roles(role)
                 first_user_pinged = False
-                print(f"{removedUser} has idled, now removed\nCurrent queue:\n{queue_list}")
+                print(f"{target} has idled, now removed\nCurrent queue:\n{queue_list}")
             except Exception as e:
                 print(f"Error: {e}")
 
