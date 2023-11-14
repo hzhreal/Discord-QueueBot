@@ -50,7 +50,7 @@ async def idleListener(ctx, bot):
             if len(queue_list) >= 1: return message.author == target
 
         try:
-            message = await bot.wait_for('message', check=lambda message:check(message), timeout=5) # how many seconds until idle kick
+            message = await bot.wait_for('message', check=lambda message:check(message), timeout=300) # how many seconds until idle kick
             print(f"Obtained: {message.content}")
         except asyncio.TimeoutError:
             try:
