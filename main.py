@@ -273,6 +273,8 @@ async def ping(ctx) -> None:
 @bot.command()
 @commands.has_role("Owner")
 async def echo(ctx, *, message: str) -> None:
+    if ctx.message.author.guild_permissions.manage_messages:
+        await ctx.channel.purge(limit=1)
     await ctx.send(message) 
 
 bot.run(str(os.getenv("TOKEN"))) # token
