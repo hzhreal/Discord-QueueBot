@@ -10,15 +10,17 @@ QUEUE_CHANNEL_ID = int(os.getenv("QUEUE_CHANNEL_ID"))
 ROLE_NAME = str(os.getenv("ROLE_NAME"))
 
 activity = discord.Activity(type=discord.ActivityType.watching, name="HTO")
+intents = discord.Intents.default()
+intents.message_content = True
 
-bot = commands.Bot(command_prefix="!", activity=activity)
+bot = commands.Bot(command_prefix=">", activity=activity, intents=intents)
 @bot.event
-async def on_ready():
+async def on_ready() -> None:
     print(
         f"Bot is ready, invite link: https://discord.com/api/oauth2/authorize?client_id={bot.user.id}&permissions=8&scope=bot"
     )
 @bot.event
-async def on_message(message):
+async def on_message(message) -> None:
     if message.author.bot:
         return
 
@@ -40,7 +42,7 @@ update_role_running = True
 first_user_pinged = False
 
 @tasks.loop(seconds=1)
-async def idleListener(ctx, bot):
+async def idleListener(ctx, bot) -> None:
     global first_user_pinged, queue_list
 
     if len(queue_list) >= 1:
@@ -50,7 +52,7 @@ async def idleListener(ctx, bot):
             if len(queue_list) >= 1: return message.author == target
 
         try:
-            message = await bot.wait_for('message', check=lambda message:check(message), timeout=300) # how many seconds until idle kick
+            message = await bot.wait_for('message', check=lambda message:check(message), timeout=480) # how many seconds until idle kick
             print(f"Obtained: {message.content}")
         except asyncio.TimeoutError:
             try:
@@ -65,7 +67,7 @@ async def idleListener(ctx, bot):
             except Exception as e:
                 print(f"Error: {e}")
 
-async def changeperm(ctx):
+async def changeperm(ctx) -> None:
     try:
         role = discord.utils.get(ctx.guild.roles, name=ROLE_NAME) # role name
         target_channel = ctx.guild.get_channel(BOT_CHANNEL_ID) # bot channel id
@@ -82,7 +84,7 @@ async def changeperm(ctx):
 
 @commands.has_role("Owner")
 @bot.slash_command(description="Start the queue.")
-async def queue(ctx):
+async def queue(ctx) -> None:
     global queue_list, update_role_running, first_user_pinged
 
     update_role_running = True
@@ -99,7 +101,7 @@ async def queue(ctx):
             super().__init__(timeout=None) # specify the timeout here
 
         @discord.ui.button(label="Join queue", style=discord.ButtonStyle.success)
-        async def callback(self, button, interaction):
+        async def callback(self, button, interaction) -> None:
             global first_user_pinged
 
             author = interaction.user  # Get the author of the interaction (the user who clicked)
@@ -139,7 +141,7 @@ async def queue(ctx):
     message = await target_channel2.send(embed=embed, view=queuebutton())
 
     @tasks.loop(seconds=1)  # Adjust the update interval as needed
-    async def update_queue_embed():
+    async def update_queue_embed() -> None:
         nonlocal queue_text
         global first_user_pinged
 
@@ -174,13 +176,13 @@ async def queue(ctx):
     idleListener.start(ctx, bot)
 
 @queue.error
-async def role_error(ctx, error):
+async def role_error(ctx, error) -> None: 
     if isinstance(error, commands.MissingRole):
         await ctx.respond(embed=embed_missing_role)
 
 @commands.has_role("Owner")
 @bot.slash_command(description="End the queue.")
-async def end(ctx):
+async def end(ctx) -> None:
     global update_role_running, queue_list
 
     await ctx.respond("Shutting down queue.", ephemeral=True)
@@ -210,13 +212,13 @@ async def end(ctx):
     await ctx.respond("Shut down queue.", ephemeral=True)
             
 @end.error
-async def role_error1(ctx, error):
+async def role_error1(ctx, error) -> None:
     if isinstance(error, commands.MissingRole):
         await ctx.respond(embed=embed_missing_role)
 
 @bot.slash_command(description="Removes an user from the queue.")
 @commands.has_any_role("Owner", "Admin", "Mod")
-async def remove(ctx, user: discord.Member):
+async def remove(ctx, user: discord.Member) -> None:
     global first_user_pinged, queue_list
 
     embedrm = discord.Embed(title="Remove user", description=f"Removed {user} from list.", color=discord.Color.green())
@@ -259,13 +261,18 @@ async def remove(ctx, user: discord.Member):
 
 
 @remove.error
-async def role_error2(ctx, error):
+async def role_error2(ctx, error) -> None:
     if isinstance(error, commands.MissingAnyRole):
         await ctx.respond(embed=embed_missing_role)
 
 @bot.slash_command(description="Pings the bot.")
-async def ping(ctx):
+async def ping(ctx) -> None:
     latency = bot.latency * 1000
-    await ctx.respond(f"Pong! {latency: .2f}ms.")       
+    await ctx.respond(f"Pong! {latency: .2f}ms.")     
+
+@bot.command()
+@commands.has_role("Owner")
+async def echo(ctx, *, message: str) -> None:
+    await ctx.send(message) 
 
 bot.run(str(os.getenv("TOKEN"))) # token
